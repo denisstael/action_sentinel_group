@@ -1,7 +1,7 @@
 AllCops:
   TargetRubyVersion: 2.6
   Exclude:
-    - "lib/generators/**/templates/*"
+    - "lib/generators/**/templates/**/*"
   NewCops: disable
 
 Style/Documentation:
@@ -25,6 +25,7 @@ Metrics/BlockLength:
   Enabled: true
   Exclude:
     - "spec/**/*"
+    - "action_sentinel_group.gemspec"
 
 Naming/HeredocDelimiterNaming:
   Enabled: true

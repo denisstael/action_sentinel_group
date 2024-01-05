@@ -3,6 +3,8 @@
 require "action_sentinel_group/permissions"
 
 module ActionSentinelGroup
+  #
+  # Module to be included in ActionSentinel
   module Model
     # rubocop:disable Naming/PredicateName
 

@@ -31,6 +31,10 @@ Gem::Specification.new do |spec|
 
   spec.require_paths = ["lib"]
 
+  spec.add_dependency "action_sentinel", "~> 0.3.0"
+
+  spec.add_development_dependency "activerecord", ">= 5.2"
+  spec.add_development_dependency "railties", ">= 5.2"
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "rubocop", "~> 1.21"
   spec.add_development_dependency "sqlite3", "~> 1.4.2"

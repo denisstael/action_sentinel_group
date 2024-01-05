@@ -1,39 +1,94 @@
 # ActionSentinelGroup
 
-TODO: Delete this and the text below, and describe your gem
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/action_sentinel_group`. To experiment with that code, run `bin/console` for an interactive prompt.
-
+Control of group access permissions to controller actions using [ActionSentinel](https://github.com/denisstael/action_sentinel).
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+### 1. Add the gem into your project
 
-Install the gem and add to the application's Gemfile by executing:
+Add this to your Gemfile and run `bundle install`.
 
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+```ruby
+gem 'action_sentinel_group'
+```
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+Or install it yourself as:
+```sh
+gem install action_sentinel_group
+```
 
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+### 2. Generate Models
+
+Use the ActionSentinelGroup generator to create the required models and its migrations. This generator expects that you already have a user model. 
+
+You must specify the name of the user model and the name of the model that will represent the group of users. For example, if the name of your user model is `User` and you want a group model called `Group`, you can call:
+```
+rails g action_sentinel_group:install User Group
+```
+
+If your database uses UUID for the primary and foreign keys, you can pass the `--uuid` option:
+
+```
+rails g action_sentinel_group:install User Group --uuid
+```
+
+The generator will create the group model with the name that you provided (in this example it will be `Group`), it will also create a model called `UserGroup` (the junction between your user model name and the group model), create the migrations and will insert into your User class the required methods to check the user's groups access permissions.
+
+It will invoke the [generator from ActionSentinel](https://github.com/denisstael/action_sentinel#2-generate-accesspermission-model) to create `AccessPermission` model and insert into Group model the required methods to manage access permissions.
+
+Finally, it will create an initializer file with the required configurations.
+
+### 3. Run the migrations
+
+You can check the migrations created into your migrations folder, and add custom fields before running them if necessary.
+```
+rails db:migrate
+```
 
 ## Usage
 
-TODO: Write usage instructions here
+### Managing permissions to the group
 
-## Development
+You can add manage permissions to a group at the same way that is informed by [ActionSentinel](https://github.com/denisstael/action_sentinel#usage):
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+```ruby
+# Adding permissions to access create and update actions in UsersController
+group.add_permissions_to 'create', 'update', 'users'
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+# Removing permissions to access create and update actions in UsersController
+group.remove_permissions_to 'create', 'update', 'users'
+
+# Checking if the group have permission to access create action in UsersController
+group.has_permission_to? 'create', 'users'
+```
+
+### Check permissions for a user of the group
+
+You can associate a user to a group that have permissions to acces actions of some controllers, and you can check if the user have the pemission to access some action of a controller, in the same way that you check the group permission:
+
+```ruby
+# Associating the user with the group
+UserGroup.create(user_id: user.id, group_id: group.id)
+
+# Giving permission to the group to action 'create' of a controller called PostsController
+group.add_permissions_to('create', 'posts')
+
+# Checking if the user has permission to access the action 'create' of a controller called PostsController
+user.has_permission_to?('create', 'posts')
+```
+
+## Authorization
+
+To controllers authorization and another configurations about authorization methods, you can follow the instructions provided by the documentation of ActionSentinel gem:
+
+- [Include authorization in ApplicationController](https://github.com/denisstael/action_sentinel#4-include-authorization-in-applicationcontroller)
+- [Authorization method](https://github.com/denisstael/action_sentinel#authorization)
+- [Action User](https://github.com/denisstael/action_sentinel#action-user)
+- [Rescuing an UnauthorizedAction in ApplicationController](https://github.com/denisstael/action_sentinel#rescuing-an-unauthorizedaction-in-applicationcontroller)
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/action_sentinel_group. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/action_sentinel_group/blob/master/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/denisstael/action_sentinel_group.
 
 ## License
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
-
-## Code of Conduct
-
-Everyone interacting in the ActionSentinelGroup project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/action_sentinel_group/blob/master/CODE_OF_CONDUCT.md).
